@@ -20,6 +20,7 @@ juce_add_plugin(NoizzFurther
     IS_MIDI_EFFECT FALSE
     EDITOR_WANTS_KEYBOARD_FOCUS TRUE
     COPY_PLUGIN_AFTER_BUILD FALSE
+    VST3_AUTO_MANIFEST FALSE
     PLUGIN_MANUFACTURER_CODE Noiz
     PLUGIN_CODE NzFr
     FORMATS VST3
@@ -47,6 +48,7 @@ target_compile_definitions(NoizzFurther
         JUCE_WEB_BROWSER=0
         JUCE_USE_CURL=0
         JUCE_VST3_CAN_REPLACE_VST2=0
+        JUCE_DISPLAY_SPLASH_SCREEN=0
 )
 
 target_link_libraries(NoizzFurther
