@@ -1,0 +1,40 @@
+name: Build NOIZZ FURTHER VST3
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Configure CMake
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+    - name: Build VST3
+      run: cmake --build build --config Release --target NoizzFurther_VST3
+
+    - name: Upload VST3 Artifact (Windows)
+      if: matrix.os == 'windows-latest'
+      uses: actions/upload-artifact@v4
+      with:
+        name: NoizzFurther-VST3-Windows
+        path: build/NoizzFurther_artefacts/Release/VST3/NOIZZ FURTHER.vst3
+
+    - name: Upload VST3 Artifact (macOS)
+      if: matrix.os == 'macos-latest'
+      uses: actions/upload-artifact@v4
+      with:
+        name: NoizzFurther-VST3-macOS
+        path: build/NoizzFurther_artefacts/Release/VST3/NOIZZ FURTHER.vst3
