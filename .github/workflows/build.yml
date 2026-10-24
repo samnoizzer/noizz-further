@@ -10,6 +10,7 @@ on:
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
         os: [windows-latest, macos-latest]
 
@@ -30,11 +31,11 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: NoizzFurther-VST3-Windows
-        path: build/NoizzFurther_artefacts/Release/VST3/NOIZZ FURTHER.vst3
+        path: build/NoizzFurther_artefacts/Release/VST3/NoizzFurther.vst3
 
     - name: Upload VST3 Artifact (macOS)
       if: matrix.os == 'macos-latest'
       uses: actions/upload-artifact@v4
       with:
         name: NoizzFurther-VST3-macOS
-        path: build/NoizzFurther_artefacts/Release/VST3/NOIZZ FURTHER.vst3
+        path: build/NoizzFurther_artefacts/Release/VST3/NoizzFurther.vst3
