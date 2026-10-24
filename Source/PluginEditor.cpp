@@ -92,7 +92,8 @@ void NoizzFurtherAudioProcessorEditor::timerCallback()
 
     repaint();
 }
-
+auto bg = juce::ImageCache::getFromMemory(BinaryData::background_png, BinaryData::background_pngSize);
+g.drawImage(bg, getLocalBounds().toFloat());
 void NoizzFurtherAudioProcessorEditor::paint (juce::Graphics& g)
 {
     // 1. Gunmetal Gray Outer Rack Chassis
