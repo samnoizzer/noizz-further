@@ -22,11 +22,10 @@ juce_add_plugin(NoizzFurther
     COPY_PLUGIN_AFTER_BUILD FALSE
     PLUGIN_MANUFACTURER_CODE Noiz
     PLUGIN_CODE NzFr
-    FORMATS VST3 Standalone
-    PRODUCT_NAME "NOIZZ FURTHER"
+    FORMATS VST3
+    PRODUCT_NAME "NoizzFurther"
 )
 
-# Generates <JuceHeader.h> so the Source files can include it
 juce_generate_juce_header(NoizzFurther)
 
 target_sources(NoizzFurther
@@ -37,7 +36,6 @@ target_sources(NoizzFurther
         Source/PluginEditor.h
 )
 
-# Automatically embeds Assets/background.png ONLY if the file exists in your repo
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Assets/background.png")
     juce_add_binary_data(NoizzAssets SOURCES Assets/background.png)
     target_link_libraries(NoizzFurther PRIVATE NoizzAssets)
@@ -57,6 +55,4 @@ target_link_libraries(NoizzFurther
         juce::juce_dsp
     PUBLIC
         juce::juce_recommended_config_flags
-        juce::juce_recommended_lto_flags
-        juce::juce_recommended_warning_flags
 )
