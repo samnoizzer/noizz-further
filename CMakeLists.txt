@@ -4,7 +4,6 @@ project(NoizzFurther VERSION 1.0.0)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Automatically fetch JUCE from GitHub during build
 include(FetchContent)
 FetchContent_Declare(
     JUCE
@@ -27,6 +26,9 @@ juce_add_plugin(NoizzFurther
     PRODUCT_NAME "NOIZZ FURTHER"
 )
 
+# Generates <JuceHeader.h> so the Source files can include it
+juce_generate_juce_header(NoizzFurther)
+
 target_sources(NoizzFurther
     PRIVATE
         Source/PluginProcessor.cpp
@@ -35,9 +37,12 @@ target_sources(NoizzFurther
         Source/PluginEditor.h
 )
 
-# Optional: Uncomment the block below once you drop background.png into Assets/
-juce_add_binary_data(NoizzAssets SOURCES Assets/background.png)
-target_link_libraries(NoizzFurther PRIVATE NoizzAssets)
+# Automatically embeds Assets/background.png ONLY if the file exists in your repo
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Assets/background.png")
+    juce_add_binary_data(NoizzAssets SOURCES Assets/background.png)
+    target_link_libraries(NoizzFurther PRIVATE NoizzAssets)
+    target_compile_definitions(NoizzFurther PRIVATE HAS_BACKGROUND_PNG=1)
+endif()
 
 target_compile_definitions(NoizzFurther
     PUBLIC
