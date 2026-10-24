@@ -36,8 +36,8 @@ target_sources(NoizzFurther
 )
 
 # Optional: Uncomment the block below once you drop background.png into Assets/
-# juce_add_binary_data(NoizzAssets SOURCES Assets/background.png)
-# target_link_libraries(NoizzFurther PRIVATE NoizzAssets)
+juce_add_binary_data(NoizzAssets SOURCES Assets/background.png)
+target_link_libraries(NoizzFurther PRIVATE NoizzAssets)
 
 target_compile_definitions(NoizzFurther
     PUBLIC
