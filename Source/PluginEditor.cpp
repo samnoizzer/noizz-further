@@ -28,10 +28,9 @@ NoizzFurtherAudioProcessorEditor::NoizzFurtherAudioProcessorEditor (NoizzFurther
     monoCheckButton.setColour(juce::ToggleButton::textColourId, juce::Colour(0xff00ff66));
     monoCheckButton.setColour(juce::ToggleButton::tickColourId, juce::Colour(0xff00ff66));
 
-    // Setup Numerical BPM LED Monitor (Click to enter manually, or use +/- switches)
     bpmLedLabel.setEditable(true, true, false);
     bpmLedLabel.setJustificationType(juce::Justification::centred);
-    bpmLedLabel.setFont(juce::Font(juce::Font::getDefaultMonospacedFontName(), 18.0f, juce::Font::bold));
+    bpmLedLabel.setFont(juce::FontOptions(18.0f).withStyle("Bold"));
     bpmLedLabel.setColour(juce::Label::backgroundColourId, juce::Colour(0xff070a08));
     bpmLedLabel.setColour(juce::Label::textColourId, juce::Colour(0xff00ff66));
     bpmLedLabel.setColour(juce::Label::outlineColourId, juce::Colour(0xff00ff66));
@@ -50,7 +49,6 @@ NoizzFurtherAudioProcessorEditor::NoizzFurtherAudioProcessorEditor (NoizzFurther
     addAndMakeVisible(bpmUpButton);
     addAndMakeVisible(bpmDownButton);
 
-    // Connect Knobs & Switches to APVTS
     widthAttach     = std::make_unique<SliderAttachment>(audioProcessor.apvts, "WIDTH", widthSlider);
     lowBypassAttach = std::make_unique<SliderAttachment>(audioProcessor.apvts, "LOW_BYPASS", lowBypassSlider);
     lfoRateAttach   = std::make_unique<SliderAttachment>(audioProcessor.apvts, "LFO_RATE", lfoRateSlider);
@@ -61,7 +59,7 @@ NoizzFurtherAudioProcessorEditor::NoizzFurtherAudioProcessorEditor (NoizzFurther
     float initBpm = audioProcessor.apvts.getRawParameterValue("BPM")->load();
     bpmLedLabel.setText(juce::String(initBpm, 1) + " BPM", juce::dontSendNotification);
 
-    startTimerHz(60); // 60 FPS Stereoscope refresh rate
+    startTimerHz(60);
 }
 
 NoizzFurtherAudioProcessorEditor::~NoizzFurtherAudioProcessorEditor()
@@ -92,21 +90,21 @@ void NoizzFurtherAudioProcessorEditor::timerCallback()
 
     repaint();
 }
-auto bg = juce::ImageCache::getFromMemory(BinaryData::background_png, BinaryData::background_pngSize);
-g.drawImage(bg, getLocalBounds().toFloat());
+
 void NoizzFurtherAudioProcessorEditor::paint (juce::Graphics& g)
 {
-    // 1. Gunmetal Gray Outer Rack Chassis
+#if defined(HAS_BACKGROUND_PNG) && HAS_BACKGROUND_PNG
+    auto bg = juce::ImageCache::getFromMemory(BinaryData::background_png, BinaryData::background_pngSize);
+    g.drawImage(bg, getLocalBounds().toFloat());
+#else
     g.fillAll (juce::Colour(0xff26292e));
 
-    // Inner Black Panel
     juce::Rectangle<int> centerPanel(150, 20, 560, 480);
     g.setColour(juce::Colour(0xff0d0f12));
     g.fillRoundedRectangle(centerPanel.toFloat(), 8.0f);
     g.setColour(juce::Colour(0xff3d434d));
     g.drawRoundedRectangle(centerPanel.toFloat(), 8.0f, 2.0f);
 
-    // 2. Futuristic PCB Lining Traces
     g.setColour(juce::Colour(0x4400ff66));
     for (int i = 0; i < 6; ++i)
     {
@@ -120,7 +118,6 @@ void NoizzFurtherAudioProcessorEditor::paint (juce::Graphics& g)
         g.fillEllipse(597.0f, yOffset + 13.0f, 5.0f, 5.0f);
     }
 
-    // 3. Center Logo & Title Header
     g.setColour(juce::Colour(0xff00ff66));
     for (int r = 0; r < 4; ++r)
         g.drawEllipse(430.0f - (45.0f + r * 6.0f), 85.0f - (45.0f + r * 6.0f), (45.0f + r * 6.0f) * 2.0f, (45.0f + r * 6.0f) * 2.0f, 1.2f);
@@ -129,30 +126,28 @@ void NoizzFurtherAudioProcessorEditor::paint (juce::Graphics& g)
     pyramid.addTriangle(430.0f, 45.0f, 390.0f, 115.0f, 470.0f, 115.0f);
     g.strokePath(pyramid, juce::PathStrokeType(1.8f));
 
-    g.setFont(juce::Font(28.0f, juce::Font::bold));
+    g.setFont(juce::FontOptions(28.0f).withStyle("Bold"));
     g.drawText("NOIZZ STUDIO", 280, 125, 300, 35, juce::Justification::centred);
-    g.setFont(juce::Font(32.0f, juce::Font::bold));
+    g.setFont(juce::FontOptions(32.0f).withStyle("Bold"));
     g.drawText("NOIZZ FURTHER", 250, 175, 360, 40, juce::Justification::centred);
 
     g.setColour(juce::Colours::silver);
-    g.setFont(juce::Font(12.0f, juce::Font::plain));
+    g.setFont(juce::FontOptions(12.0f));
     g.drawText("STEREO SPREAD // SPATIAL PROCESSOR", 250, 212, 360, 20, juce::Justification::centred);
+#endif
 
-    // 4. Stereoscope Monitor Screen
     juce::Rectangle<int> scopeRect(230, 250, 400, 225);
     g.setColour(juce::Colour(0xff050806));
     g.fillRoundedRectangle(scopeRect.toFloat(), 6.0f);
     g.setColour(juce::Colour(0xff00ff66).withAlpha(0.6f));
     g.drawRoundedRectangle(scopeRect.toFloat(), 6.0f, 1.5f);
 
-    // Scope Grid Lines
     g.setColour(juce::Colour(0x2200ff66));
     g.drawVerticalLine(scopeRect.getCentreX(), (float)scopeRect.getY(), (float)scopeRect.getBottom());
     g.drawHorizontalLine(scopeRect.getCentreY(), (float)scopeRect.getX(), (float)scopeRect.getRight());
     g.drawLine((float)scopeRect.getX(), (float)scopeRect.getY(), (float)scopeRect.getRight(), (float)scopeRect.getBottom(), 1.0f);
     g.drawLine((float)scopeRect.getX(), (float)scopeRect.getBottom(), (float)scopeRect.getRight(), (float)scopeRect.getY(), 1.0f);
 
-    // Plot Real-Time Lissajous Polar Vectorscope
     if (!visualPoints.empty())
     {
         g.setColour(juce::Colour(0xff00ff66));
@@ -176,9 +171,8 @@ void NoizzFurtherAudioProcessorEditor::paint (juce::Graphics& g)
         }
     }
 
-    // 5. Knob Labels
     g.setColour(juce::Colour(0xff00ff66));
-    g.setFont(juce::Font(13.0f, juce::Font::bold));
+    g.setFont(juce::FontOptions(13.0f).withStyle("Bold"));
     g.drawText("WIDTH (0-200%)", 20, 35, 115, 20, juce::Justification::centred);
     g.drawText("LOW BYPASS",     20, 195, 115, 20, juce::Justification::centred);
     g.drawText("SIDE DRIVE",     725, 35, 115, 20, juce::Justification::centred);
@@ -187,17 +181,14 @@ void NoizzFurtherAudioProcessorEditor::paint (juce::Graphics& g)
 
 void NoizzFurtherAudioProcessorEditor::resized()
 {
-    // Left Column Controls
     widthSlider.setBounds(22, 60, 110, 115);
     lowBypassSlider.setBounds(22, 220, 110, 115);
     monoCheckButton.setBounds(25, 365, 110, 30);
 
-    // Right Column Controls
     driveSlider.setBounds(728, 60, 110, 115);
     lfoRateSlider.setBounds(728, 220, 110, 115);
     lfoSyncButton.setBounds(740, 350, 90, 26);
 
-    // Numerical LED BPM Monitor & +/- Switches
     bpmLedLabel.setBounds(722, 385, 92, 32);
     bpmUpButton.setBounds(816, 385, 24, 15);
     bpmDownButton.setBounds(816, 402, 24, 15);
